@@ -1,5 +1,6 @@
 package com.cydeo.accounting_app.controller;
 
+import com.cydeo.accounting_app.annotation.ExecutionTime;
 import com.cydeo.accounting_app.dto.ClientVendorDTO;
 import com.cydeo.accounting_app.service.AddressService;
 import com.cydeo.accounting_app.service.ClientVendorService;
@@ -24,7 +25,7 @@ public class ClientVendorController {
         this.addressService = addressService;
         this.invoiceService = invoiceService;
     }
-
+    @ExecutionTime
     @GetMapping("/list")
     public String listClientVendors(Model model) {
         model.addAttribute("clientVendors", clientVendorService.getAllClientVendors());
@@ -73,7 +74,7 @@ public class ClientVendorController {
         clientVendorService.updateClientVendor(id, clientVendorDTO);
         return "redirect:/clientVendors/list";
     }
-
+    @ExecutionTime
     @GetMapping("/delete/{id}")
     public String deleteClientVendor(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         boolean hasInvoice = invoiceService.existsByClientVendorId(id);
