@@ -23,6 +23,8 @@ public interface CompanyService {
 
     boolean companyNameIsExist(CompanyDTO companyDTO);
 
+    List<String> getListOfCountries();
+
 }
 
 

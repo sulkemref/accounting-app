@@ -19,9 +19,15 @@ public interface InvoiceProductService {
 
     List<InvoiceProductDTO> findAllInvoiceProductsByProductId(Long id);
 
-    boolean isStockNotEnough(InvoiceProductDTO invoiceProductDTO);
+    boolean isStockNotEnough(InvoiceProductDTO invoiceProductDTO, Long invoiceId);
 
     List<InvoiceProductDTO> findAllInvoiceProductsByInvoiceStatus(InvoiceStatus invoiceStatus);
 
-    List<InvoiceProductDTO> findAllInvoiceProductsByInvoiceStatusAndId();
+
+    List<InvoiceProductDTO> findAllInvoiceProductsByStatusAndCompany();
+
+
+    String productLowLimitAlert(InvoiceProductDTO invoiceProductDTO, Long invoiceId);
+
+    void calculationProfitLossAllInvoiceProducts(Long invoiceId);
 }

@@ -1,6 +1,7 @@
 package com.cydeo.accounting_app.controller;
 
 import com.cydeo.accounting_app.dto.CompanyDTO;
+import com.cydeo.accounting_app.dto.CountryResponseDTO;
 import com.cydeo.accounting_app.service.AddressService;
 import com.cydeo.accounting_app.service.CompanyService;
 import org.springframework.stereotype.Controller;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/companies")
@@ -27,7 +29,6 @@ public class CompanyController {
     @GetMapping("/create")
     public String companyCreate(Model model) {
         model.addAttribute("newCompany", new CompanyDTO());
-       // model.addAttribute("countries", List.of(addressService.listOfCountries()));
         return "/company/company-create";
     }
 
@@ -40,7 +41,6 @@ public class CompanyController {
         }
 
         if (bindingResult.hasErrors()) {
-            //model.addAttribute("title", "Company title is a required field");
             return "/company/company-create";
         }
         companyService.saveCompany(companyDTO);
@@ -56,14 +56,13 @@ public class CompanyController {
     @GetMapping("/update/{id}")
     public String editCompany(@PathVariable("id") Long id, Model model) {
         model.addAttribute("company", companyService.findById(id));
-        //model.addAttribute("countries", List.of(addressService.listOfCountries()).get(0));
 
         return "/company/company-update";
     }
 
     @PostMapping("/update/{id}")
-    public String updateCompany(@PathVariable("id") Long id, @ModelAttribute("company")
-    CompanyDTO companyDTO, BindingResult bindingResult) {
+    public String updateCompany(@Valid @ModelAttribute("company") CompanyDTO companyDTO,
+                                BindingResult bindingResult, @PathVariable("id") Long id ) {
         companyDTO.setId(id);
         boolean companyNameIsExist = companyService.companyNameIsExist(companyDTO);
 
@@ -92,8 +91,8 @@ public class CompanyController {
 }
 @ModelAttribute()
    public void commonModelAttribute(Model model) {
-    model.addAttribute("countries", List.of(addressService.listOfCountries().get(0)));
-     //   model.addAttribute("company", companyService.listAllCompanies());
+    model.addAttribute("countries", companyService.getListOfCountries());
+
    }
 
 }

@@ -12,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import javax.validation.Valid;
 
 @Controller
@@ -62,7 +64,6 @@ public class SalesInvoiceController {
     @PostMapping("/update/{invoiceId}")
     public String insertUpdatedInvoice(@ModelAttribute("newSalesInvoice") @Valid InvoiceDTO invoiceDTO,BindingResult bindingResult,
                                  @PathVariable("invoiceId") Long invoiceId){
-
         if (bindingResult.hasErrors()) {
             return "invoice/sales-invoice-update";
         }
@@ -92,18 +93,24 @@ public class SalesInvoiceController {
 
     @PostMapping("/addInvoiceProduct/{invoiceId}")
     public String insertInvoiceProduct(@ModelAttribute("newInvoiceProduct") @Valid InvoiceProductDTO invoiceProductDTO,
-                                       BindingResult bindingResult, Model model, @PathVariable("invoiceId") Long invoiceId) {
-        boolean stockNotEnough = invoiceProductService.isStockNotEnough(invoiceProductDTO);
-        if (bindingResult.hasErrors()||stockNotEnough){
+                                       BindingResult bindingResult, Model model, @PathVariable("invoiceId") Long invoiceId,
+                                       RedirectAttributes redirectAttrs) {
+        boolean stockNotEnough = invoiceProductService.isStockNotEnough(invoiceProductDTO,invoiceId);
+        if (bindingResult.hasErrors()){
             model.addAttribute("invoice",invoiceService.findById(invoiceId));
             model.addAttribute("invoiceProducts", invoiceProductService.findAllInvoiceProductsByInvoiceId(invoiceId));
-            if(stockNotEnough){
-                model.addAttribute("newInvoiceProduct", new InvoiceProductDTO());
-                model.addAttribute("error", "Not enough " + invoiceProductDTO.getProduct().getName() + " quantity to sell.");
-            }
             return "invoice/sales-invoice-update";
         }
-        invoiceProductService.saveInvoiceProduct(invoiceProductDTO,invoiceId);
+        if (stockNotEnough){
+            redirectAttrs.addFlashAttribute("error", "Not enough " +
+                    invoiceProductDTO.getProduct().getName() + " quantity to sell.");
+        }else{
+            invoiceProductService.saveInvoiceProduct(invoiceProductDTO,invoiceId);
+            if(!invoiceProductService.productLowLimitAlert(invoiceProductDTO,invoiceId).isEmpty()){
+                redirectAttrs.addFlashAttribute("error", "Stock of " +
+                        invoiceProductService.productLowLimitAlert(invoiceProductDTO,invoiceId) + " decreased below low limit");
+            }
+        }
         return "redirect:/salesInvoices/update/"+invoiceId;
     }
 
