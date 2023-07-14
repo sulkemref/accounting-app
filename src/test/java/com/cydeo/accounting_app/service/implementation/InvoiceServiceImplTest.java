@@ -48,7 +48,7 @@ class InvoiceServiceImplTest {
     @Test
     void indInvoiceById_ExceptionTest(){
 
-        when(invoiceRepository.findById(anyLong())).thenThrow(new InvoiceNotFoundException("Invoice not found"));
+        when(invoiceRepository.findById(anyLong())).thenThrow(new InvoiceNotFoundException("The invoice not found"));
 
         Throwable throwable = assertThrows(InvoiceNotFoundException.class,
                 () -> invoiceRepository.findById(anyLong()));
