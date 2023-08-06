@@ -95,7 +95,7 @@ public class InvoiceServiceImpl extends LoggedInUserService implements InvoiceSe
         List<InvoiceProductDTO> allInvoiceProductsDTO  = invoiceProductService.findAllInvoiceProductsByInvoiceId(invoiceId)
                 .stream()
                 .distinct()
-                .toList();
+                .collect(Collectors.toList());
         for (InvoiceProductDTO each : allInvoiceProductsDTO) {
             int productQuantityInStock = each.getProduct().getQuantityInStock();
             int productQuantityInInvoice = invoiceProductService.findAllInvoiceProductsByInvoiceId(invoiceId)
