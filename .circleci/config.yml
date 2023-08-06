@@ -4,7 +4,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/openjdk:17
+      - image: amd64/maven:3.8.3-openjdk-17
     working_directory: /tmp/workspace
     steps:
       - checkout
