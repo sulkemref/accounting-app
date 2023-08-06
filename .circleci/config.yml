@@ -4,7 +4,7 @@ jobs:
   build:
     docker:
       # specify the version you desire here
-      - image: circleci/amazoncorretto:17
+      - image: circleci/openjdk:11-jdk
     working_directory: /tmp/workspace
     steps:
       - checkout
