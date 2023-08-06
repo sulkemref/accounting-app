@@ -1,44 +1,45 @@
-version: '3.1'
-services:                             # Which containers I need.
-  app:                                # First container.
-    networks:                         # Which network this container will use.
+version: '3.8'
+services:
+  accounting-app:
+    networks:
       - accounting-network
     container_name: accounting
-#    image: "cemils/accounting:latest"       # for windows
-#    image: "owermaiden/accounting:latest"  # for mac (with m1 chip)
-    build:                            # This container does not have an image yet, create image from below
-      context: .                      # You can find Dockerfile in the same folder you are in.
-      dockerfile: Dockerfile          # Name of the dockerfile.
-    environment:                      # Attach this environment variables to my container
-      SPRING_PROFILES_ACTIVE: default # Which profile you want to use dev / test etc.
-      DATABASE_HOST: db               # Who is the host for database, localhost or do you have other container
-      DATABASE_PORT: 5432             # Database provider will be waiting us at 5433 - Other container's port
-      DATABASE_NAME: cacoon           # Database name
-      DATABASE_USERNAME: postgres     # Database username
-      DATABASE_PASSWORD: admin        # Database password
+    image: "accounting-application:1.0"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: default
+      DATABASE_HOST: accounting-db
+      DATABASE_PORT: 5432
+      DATABASE_NAME: accounting
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: admin
       DATABASE_SSL: 'false'
       SLEEP_LENGTH: 5
     ports:
-      - "8002:8002"                     # This container will connect with my application on 8002
-    depends_on:                       # Before running this container I need 'db' container ready.
-      - db
+      - "8009:8008"
+    depends_on:
+      - accounting-db
 
-  db:                             # Second container.
-    image: postgres               # Use official postgres image to run my container
-    container_name: db
+  accounting-db:
+    image: postgres
+    container_name: postgres-db
     networks:
-      - accounting-network        # Which network this container will use.
+      - accounting-network
     ports:
-      - "5432:5432"                 # Container will expose 5432 outside, POSTGRES will connect with container on 5432
+      - "5432:5432"
     volumes:
-      - .m2:/root/.m2             # Save my data inside hosting OS ".m2:/root/.m2 folder"
+      - accounting-volume:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: postgres     # Postgres inside this container has this credentials
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
-      POSTGRES_DB: cacoon
+      POSTGRES_DB: accounting
 
-networks:                         # Create this network so as our containers can communicate each other.
+networks:
   accounting-network:
+    driver: bridge
 
-volumes:                          # Create this volume so that containers can save persisting data in it.
-  db:
+volumes:
+  accounting-volume:
+    driver: local
